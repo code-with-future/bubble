@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Pop Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #eafaf1;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 100%;
+            padding: 15px;
+        }
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 400px; /* Responsive height */
+            border: 4px solid #4caf50;
+            background-color: #ffffff;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .bubble {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #ff5722;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .bubble:hover {
+            transform: scale(1.2);
+            background-color: #ff7043;
+        }
+        .score, .timer {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .timer {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Bubble Pop Game!</h1>
+        <div class="score mb-2">Score: <span id="score">0</span></div>
+        <div class="timer mb-4">Time: <span id="timer">10</span> seconds</div>
+        <div class="game-container" id="gameContainer">
+            <!-- Bubbles will be added dynamically here -->
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div
+        class="toast"
+        id="toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        style="position: fixed; bottom: 20px; right: 20px; display: none;"
+    >
+        <div class="toast-header">
+            <strong class="mr-auto">Game Over</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Your final score is: 0
+        </div>
+    </div>
+
+    <!-- Include jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        let score = 0;
+        let timeLeft = 10;
+        let timerInterval;
+
+        const scoreDisplay = document.getElementById("score");
+        const timerDisplay = document.getElementById("timer");
+        const gameContainer = document.getElementById("gameContainer");
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        function createBubble() {
+            const bubble = document.createElement("div");
+            bubble.className = "bubble";
+            bubble.style.left =
+                Math.random() * (gameContainer.clientWidth - 60) + "px";
+            bubble.style.top =
+                Math.random() * (gameContainer.clientHeight - 60) + "px";
+            bubble.addEventListener("click", () => {
+                score++;
+                scoreDisplay.textContent = score;
+                bubble.remove();
+                createBubble(); // Create another bubble after one is clicked
+            });
+            gameContainer.appendChild(bubble);
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    toastMessage.innerHTML = `Your final score is: ${score}`;
+                    $(toast).toast('show'); // Show the toast
+                    // Clear remaining bubbles after time is up
+                    document
+                        .querySelectorAll(".bubble")
+                        .forEach((bubble) => bubble.remove());
+                }
+            }, 1000);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            for (let i = 0; i < 5; i++) {
+                createBubble(); // Initialize game with 5 bubbles
+            }
+            startTimer();
+        });
+    </script>
+</body>
+</html>
